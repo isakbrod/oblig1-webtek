@@ -1,0 +1,149 @@
+<html>
+    <head>
+        <title>index3.html</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <style>
+            @font-face {
+                font-family: 'RobotoBold';
+                src: url(fonts/Roboto-Bold.ttf) format('truetype');
+            }
+            @font-face {
+                font-family: 'RobotoReg';
+                src: url(fonts/Roboto-Regular.ttf) format('truetype');
+            }
+            @font-face {
+                font-family: 'RobotoLight';
+                src: url(fonts/Roboto-Light.ttf) format('truetype');
+            }
+            @font-face {
+                font-family: 'RobotoMed';
+                src: url(fonts/Roboto-Medium.ttf) format('truetype');
+            }
+            @font-face {
+                font-family: 'RobotoThin';
+                src: url(fonts/Roboto-Thin.ttf) format('truetype');
+            }
+
+            .weather-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 100px;
+                margin-bottom: 60px;
+            }
+
+            .weather-section {
+                font-family: 'RobotoReg';
+                background-color: #f4f4f4;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+                width: 300px;
+                margin: 0 auto;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .weather-section h3 {
+                font-family: 'RobotoBold';
+                margin-bottom: 10px;
+            }
+
+            .weather-item {
+                margin: 5px 0;
+            }
+        </style>
+        <header>
+            <h2 class="headerLogo">Header Logo</h2>
+            <span>
+                <a class="headerLink" href="index.html">Home⠀</a>
+                <a class="headerLink" href="index2.html">Posts⠀</a>
+                <a class="headerLink" href="index3.html">Weather</a>
+            </span>
+        </header>
+        <div class="content">
+            <div class="weather-container" id="weather-container">
+            </div>
+        </div>
+        <footer>
+            <p>Copyright ©</p>
+        </footer>
+        <script>
+            const cities = [
+                { name: 'Oslo', latitude: 59.9127, longitude: 10.7461 },
+                { name: 'New York', latitude: 40.7143, longitude: -74.006 },
+                { name: 'Sydney', latitude: -33.8678, longitude: 151.2073 },
+                { name: 'Paris', latitude: 48.8534, longitude: 2.3488 },
+                { name: 'Tokyo', latitude: 35.6895, longitude: 139.6917 },
+                { name: 'London', latitude: 51.5074, longitude: -0.1278 },
+                { name: 'Los Angeles', latitude: 34.0522, longitude: -118.2437 },
+                { name: 'Berlin', latitude: 52.5200, longitude: 13.4050 },
+                { name: 'Moscow', latitude: 55.7558, longitude: 37.6173 },
+                { name: 'Dubai', latitude: 25.276987, longitude: 55.296249 },
+                { name: 'Mexico City', latitude: 19.4326, longitude: -99.1332 },
+                { name: 'Cairo', latitude: 30.0444, longitude: 31.2357 },
+                { name: 'Mumbai', latitude: 19.0760, longitude: 72.8777 },
+                { name: 'Beijing', latitude: 39.9042, longitude: 116.4074 },
+                { name: 'São Paulo', latitude: -23.5505, longitude: -46.6333 },
+                { name: 'Buenos Aires', latitude: -34.6037, longitude: -58.3816 },
+                { name: 'Toronto', latitude: 43.6511, longitude: -79.3837 },
+                { name: 'Bangkok', latitude: 13.7563, longitude: 100.5018 },
+                { name: 'Seoul', latitude: 37.5665, longitude: 126.9780 },
+                { name: 'Singapore', latitude: 1.3521, longitude: 103.8198 },
+                { name: 'Johannesburg', latitude: -26.2041, longitude: 28.0473 },
+                { name: 'Madrid', latitude: 40.4168, longitude: -3.7038 },
+                { name: 'Rome', latitude: 41.9028, longitude: 12.4964 },
+                { name: 'Lagos', latitude: 6.5244, longitude: 3.3792 }
+            ];
+    
+            async function fetchWeather(city) {
+                const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,is_day,rain,wind_speed_10m&wind_speed_unit=ms&timezone=auto&forecast_days=1`;
+    
+                try {
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+                    const weather = data.current;
+    
+                    return `
+                        <section class="weather-section">
+                            <h3>${city.name}</h3>
+                            <div class="weather-item">
+                                <strong>Temperature:</strong> ${weather.temperature_2m}°C
+                            </div>
+                            <div class="weather-item">
+                                <strong>Wind Speed:</strong> ${weather.wind_speed_10m} m/s
+                            </div>
+                            <div class="weather-item">
+                                <strong>Rain:</strong> ${weather.rain ? weather.rain : "0"} mm
+                            </div>
+                            <div class="weather-item">
+                                <strong>Day/Night:</strong> ${weather.is_day ? "Day" : "Night"}
+                            </div>
+                        </section>`;
+                } catch (error) {
+                    console.error(`Error fetching weather data for ${city.name}:`, error);
+                    return `
+                        <section class="weather-section">
+                            <h3>Weather in ${city.name}</h3>
+                            <div class="weather-item">Error fetching data</div>
+                        </section>`;
+                }
+            }
+    
+            async function updateWeather() {
+                const weatherContainer = document.getElementById('weather-container');
+                weatherContainer.innerHTML = '';
+    
+                for (const city of cities) {
+                    const cityWeatherHTML = await fetchWeather(city);
+                    weatherContainer.innerHTML += cityWeatherHTML;
+                }
+            }
+    
+            setInterval(updateWeather, 300000);
+    
+            updateWeather();
+        </script>
+    </body>
+</html>
